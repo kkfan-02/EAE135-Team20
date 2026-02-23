@@ -23,6 +23,7 @@ E11 = 148e3;                                % Axial Young's Modulus [Mpa]
 E22 = 10.5e3;                               % Transverse Young's Modulus [Mpa]
 v12 = 0.30;                                 % Major Poisson's ratio
 v21 = v12*E22/E11;                          % Minor Poisson's ratio
+G12 = 5.61e3;                               % Shear modulus [MPa]
 
 % Strengths for failure analysis
 StrengthTensile_0deg = 2137;                % MPa - Axial Tensile Strength (0 deg ply)
@@ -82,6 +83,12 @@ Qbar_0deg = calcQbar(Q, T_0deg, R)
 Qbar_pos45deg = calcQbar(Q, T_pos45deg, R)
 Qbar_neg45deg = calcQbar(Q, T_neg45deg, R)
 Qbar_90deg = calcQbar(Q, T_90deg, R)
+
+% QBAR VALUE CHECK
+% Q0deg (1,1) = Q90deg (2,2)   - PASS
+% Q45deg (1,1) = Q45deg (2,2)  - PASS
+% Q45deg (3,3) > Q0deg (3,3)   - PASS
+
 
 Sbar_0deg = inv(Qbar_0deg);
 Sbar_pos45deg = inv(Qbar_pos45deg);
