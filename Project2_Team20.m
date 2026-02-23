@@ -35,7 +35,7 @@ E90 = E22;
 E45 = 1/(1/E11 + 1/E22);
 Eeff = (2*E0 + 4*E45 + 2*E90)/8;        % Simple effective modulus for [0/+45/-45/90]s *idk maybe*
 
-P_tot = P - lift*sin(AoA);
+P_tot = P - lift*sin(rad2deg(AoA)); 
 u1_axial = @(x1) (P_tot/(Eeff*A))*(x1 - length);
 
 u_left = u1_axial(0);       % max magnitude
@@ -43,6 +43,7 @@ u_right = u1_axial(length);      % fixed end
 
 x1 = linspace(0, length, 200);
 u_axial = u1_axial(x1);
+
 
 figure;
 plot(x1, u_axial, 'LineWidth', 1.5); grid on;
