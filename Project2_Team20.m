@@ -26,3 +26,18 @@ tens_trav = 7.75*6.895e6;   % transverse tensile strength (Pa)
 comp_trav = -24.4*6.895e6;  % transverse compressive strength (Pa)
 strain_tens_ax = 0.014;     % axial tensile failure strain
 strain_comp_ax = -0.01;     % axial compressive failure strain
+
+% Axial Stress/Displacement
+A = pi*(rk_d/2)^2 - pi*(prop_d/2)^2;  % cross-sectional area of the case (m^2)
+% Material (SI)
+E11 = 21.5e6 * 6894.757;   % Pa
+E22 = 1.46e6 * 6894.757;   % Pa
+
+% Simple effective modulus for [0/+45/-45/90]s
+E0  = E11;
+E90 = E22;
+E45 = 1/(1/E11 + 1/E22);   % harmonic-type approximation
+Eeff = (2*E0 + 4*E45 + 2*E90)/8;
+
+u1_axial = @(x1) (P/(Eeff*A))*(x1 - l);
+
