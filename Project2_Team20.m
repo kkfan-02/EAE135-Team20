@@ -29,9 +29,6 @@ strain_comp_ax = -0.01;     % axial compressive failure strain
 
 % Axial Stress/Displacement
 A = pi*(rk_d/2)^2 - pi*(prop_d/2)^2;  % cross-sectional area of the case (m^2)
-% Material (SI)
-E11 = 21.5e6 * 6894.757;   % Pa
-E22 = 1.46e6 * 6894.757;   % Pa
 
 % Simple effective modulus for [0/+45/-45/90]s
 E0  = E11;
