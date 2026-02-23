@@ -1,13 +1,13 @@
-% Project 2
+% Project 2 - EAE 135
 % Team 20
-% 2024-06-01
+% DUE: 02/24/26
 
 F = 726000;         % max thrust of first stage (N)
-rk_d = 1.28;        % rocket diameter (m)
-prop_d = 1.18;      % propellant diameter (m)
-aoa = 20;           % angle of attack (deg)
-l = 5*rk_d;         % rocket length (m)
-t = 6.25e-3;        % thickness of one layer of carbon epoxy (m)
+rocket_diam = 1.28;        % rocket diameter (m)
+prop_diam = 1.18;      % propellant diameter (m)
+AoA = 20;           % angle of attack (deg)
+length = 5*rk_d;         % rocket length (m)
+thickness_oneLayer = 6.25e-3;        % thickness of one layer of carbon epoxy (m)
 cpcg = rk_d;        % distance btwn cp-cg (m)
 P = 600000;         % net axial force on O (N)
 W = 8500;           % weight of rocket (kg)
@@ -26,3 +26,5 @@ tens_trav = 7.75*6.895e6;   % transverse tensile strength (Pa)
 comp_trav = -24.4*6.895e6;  % transverse compressive strength (Pa)
 strain_tens_ax = 0.014;     % axial tensile failure strain
 strain_comp_ax = -0.01;     % axial compressive failure strain
+
+%
