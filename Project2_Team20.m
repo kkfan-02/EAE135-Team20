@@ -15,8 +15,14 @@ lift = 1400000;     % lift force (N)
 FoS = 1.25;         % safety factor
 
 % AS4/Epoxy properties
-rho = 1522.3948;        % density (kg/m^3)
-E11 = 21.5*6.895e9;     % longitudinal modulus (Pa)
-E22 = 1.46*6.895e9;     % transverse modulus (Pa)
-v12 = 0.30;             % major Poisson's ratio
-G12 = 0.81*6.895e9;     % shear modulus (Pa)
+rho = 1522.3948;            % density (kg/m^3)
+E11 = 21.5*6.895e9;         % longitudinal modulus (Pa)
+E22 = 1.46*6.895e9;         % transverse modulus (Pa)
+v12 = 0.30;                 % major Poisson's ratio
+G12 = 0.81*6.895e9;         % shear modulus (Pa)
+tens_ax = 310*6.895e6;      % axial tensile strength (Pa)
+comp_ax = -184*6.895e6;     % axial compressive strength (Pa)
+tens_trav = 7.75*6.895e6;   % transverse tensile strength (Pa)
+comp_trav = -24.4*6.895e6;  % transverse compressive strength (Pa)
+strain_tens_ax = 0.014;     % axial tensile failure strain
+strain_comp_ax = -0.01;     % axial compressive failure strain
