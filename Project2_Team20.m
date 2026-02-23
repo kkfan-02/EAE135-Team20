@@ -24,7 +24,7 @@ E22 = 10.5e3;                               % Transverse Young's Modulus [Mpa]
 v12 = 0.30;                                 % Major Poisson's ratio
 v21 = v12*E22/E11;                          % Minor Poisson's ratio
 
-
+% Strengths for failure analysis
 StrengthTensile_0deg = 2137;                % MPa - Axial Tensile Strength (0 deg ply)
 StrengthCompressive_0deg = -184 * 6.89476;  % -184 ksi to MPa (0 deg ply)
 StrengthTensile_90deg = 53.4;               % Mpa
@@ -56,3 +56,16 @@ Q = [ E11/(1-v12*v21), v21*E11/(1-v12*v21), 0;
 beta_0deg = deg2rad(0);
 beta_45deg = deg2rad(45);
 beta_90deg = deg2rad(90);
+
+function T = calcTMatrixFromBeta(beta)
+    T = [cos(beta)^2, sin(beta)^2, 2*sin(beta)*cos(beta);
+         sin(beta)^2, cos(beta)^2, -2*sin(beta)*cos(beta);
+         -1*sin(beta)*cos(beta), sin(beta)*cos(beta), cos(beta)^2 - sin(beta)^2];
+end
+
+T_0deg = calcTMatrixFromBeta(beta_0deg);
+T_pos45deg = calcTMatrixFromBeta(beta_45deg);
+T_neg45deg = calcTMatrixFromBeta(-beta_45deg);
+T_90deg = calcTMatrixFromBeta(beta_90deg);
+
+R = [1 0 0; 0 1 0; 0 0 2];
