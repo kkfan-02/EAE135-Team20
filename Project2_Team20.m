@@ -37,7 +37,7 @@ StrengthCompressive_45deg = -24.4 * 6.89476;% -24.4 ksi to MPa (+/-45 deg ply)
 
 
 % Layup [0/+/-45/90]s (8 layers of CFRP)
-% ----------------- [0 deg]
+% ----------------- [0 deg (r=1.28/2 = 0.64m)]
 % ----------------- [+45 deg]
 % ----------------- [-45 deg]
 % ----------------- [90 deg]
@@ -45,12 +45,14 @@ StrengthCompressive_45deg = -24.4 * 6.89476;% -24.4 ksi to MPa (+/-45 deg ply)
 % ----------------- [-45 deg]
 % ----------------- [+45 deg]
 % ----------------- [0 deg]
-% \\\\\\\\\\\\\\\\\ [CORE]
-
+% \\\\\\\\\\\\\\\\\ [CORE (r=1.18/2 = 0.59m)]
+% \\\\\\  ^  \\\\\\
+% \\\\\\  |  \\\\\\
+% +++++++++++++++++ [Centerline (r=0)]
 % Q Matrix (Same for all layers)
 Q = [ E11/(1-v12*v21), v21*E11/(1-v12*v21), 0;
       v12*E22/(1-v12*v21), E22/(1-v12*v21), 0;
-      0,                    0,            G12];
+      0,                    0,            G12]
 
 % Find Qbar for each layer
 beta_0deg = deg2rad(0);
@@ -69,3 +71,24 @@ T_neg45deg = calcTMatrixFromBeta(-beta_45deg);
 T_90deg = calcTMatrixFromBeta(beta_90deg);
 
 R = [1 0 0; 0 1 0; 0 0 2];
+
+function Qbar = calcQbar(Q, T, R)
+    T_inv = inv(T);
+    R_inv = inv(R);
+    Qbar = T_inv * Q * R * T * R_inv;
+end
+
+Qbar_0deg = calcQbar(Q, T_0deg, R)
+Qbar_pos45deg = calcQbar(Q, T_pos45deg, R)
+Qbar_neg45deg = calcQbar(Q, T_neg45deg, R)
+Qbar_90deg = calcQbar(Q, T_90deg, R)
+
+Sbar_0deg = inv(Qbar_0deg);
+Sbar_pos45deg = inv(Qbar_pos45deg);
+Sbar_neg45deg = inv(Qbar_neg45deg);
+Sbar_90deg = inv(Qbar_90deg);
+
+% Extract projected Young's modulus from Sbar (Ex1x1)
+
+
+% Iterate to find H33_C and Stress per layer
