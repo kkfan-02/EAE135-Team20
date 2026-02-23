@@ -6,9 +6,9 @@ F = 726000;         % max thrust of first stage (N)
 rocket_diam = 1.28;        % rocket diameter (m)
 prop_diam = 1.18;      % propellant diameter (m)
 AoA = 20;           % angle of attack (deg)
-length = 5*rk_d;         % rocket length (m)
+length = 5*rocket_diam;         % rocket length (m)
 thickness_oneLayer = 6.25e-3;        % thickness of one layer of carbon epoxy (m)
-cpcg = rk_d;        % distance btwn cp-cg (m)
+cpcg = rocket_diam;        % distance btwn cp-cg (m)
 P = 600000;         % net axial force on O (N)
 W = 8500;           % weight of rocket (kg)
 lift = 1400000;     % lift force (N)
@@ -28,20 +28,20 @@ strain_tens_ax = 0.014;     % axial tensile failure strain
 strain_comp_ax = -0.01;     % axial compressive failure strain
 
 % Axial Stress/Displacement
-A = pi*(rk_d/2)^2 - pi*(prop_d/2)^2;  % cross-sectional area of the case (m^2)
+A = pi*(rocket_diam/2)^2 - pi*(prop_diam/2)^2;  % cross-sectional area of the case (m^2)
 
 E0  = E11;
 E90 = E22;
 E45 = 1/(1/E11 + 1/E22);
 Eeff = (2*E0 + 4*E45 + 2*E90)/8;        % Simple effective modulus for [0/+45/-45/90]s *idk maybe*
 
-P_tot = P - lift*sin(aoa);
-u1_axial = @(x1) (P_tot/(Eeff*A))*(x1 - l);
+P_tot = P - lift*sin(AoA);
+u1_axial = @(x1) (P_tot/(Eeff*A))*(x1 - length);
 
 u_left = u1_axial(0);       % max magnitude
-u_right = u1_axial(l);      % fixed end
+u_right = u1_axial(length);      % fixed end
 
-x1 = linspace(0, l, 200);
+x1 = linspace(0, length, 200);
 u_axial = u1_axial(x1);
 
 figure;
