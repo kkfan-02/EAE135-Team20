@@ -27,4 +27,24 @@ comp_trav = -24.4*6.895e6;  % transverse compressive strength (Pa)
 strain_tens_ax = 0.014;     % axial tensile failure strain
 strain_comp_ax = -0.01;     % axial compressive failure strain
 
-%
+% Axial Stress/Displacement
+A = pi*(rk_d/2)^2 - pi*(prop_d/2)^2;  % cross-sectional area of the case (m^2)
+
+E0  = E11;
+E90 = E22;
+E45 = 1/(1/E11 + 1/E22);
+Eeff = (2*E0 + 4*E45 + 2*E90)/8;        % Simple effective modulus for [0/+45/-45/90]s *idk maybe*
+
+P_tot = P - lift*sin(aoa);
+u1_axial = @(x1) (P_tot/(Eeff*A))*(x1 - l);
+
+u_left = u1_axial(0);       % max magnitude
+u_right = u1_axial(l);      % fixed end
+
+x1 = linspace(0, l, 200);
+u_axial = u1_axial(x1);
+
+figure;
+plot(x1, u_axial, 'LineWidth', 1.5); grid on;
+xlabel('x_1 (m)'); ylabel('u_{1,axial} (m)');
+title('Axial displacement along beam');
