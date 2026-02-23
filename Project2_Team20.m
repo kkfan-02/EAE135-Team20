@@ -38,7 +38,7 @@ StrengthCompressive_45deg = -24.4 * 6.89476;% -24.4 ksi to MPa (+/-45 deg ply)
 
 
 % Layup [0/+/-45/90]s (8 layers of CFRP)
-% ----------------- [0 deg (r=1.28/2 = 0.64m)]
+% ----------------- [0 deg (r=1.28/2 = 0.64m)] 
 % ----------------- [+45 deg]
 % ----------------- [-45 deg]
 % ----------------- [90 deg]
@@ -50,6 +50,7 @@ StrengthCompressive_45deg = -24.4 * 6.89476;% -24.4 ksi to MPa (+/-45 deg ply)
 % \\\\\\  ^  \\\\\\
 % \\\\\\  |  \\\\\\
 % +++++++++++++++++ [Centerline (r=0)]
+
 % Q Matrix (Same for all layers)
 Q = [ E11/(1-v12*v21), v21*E11/(1-v12*v21), 0;
       v12*E22/(1-v12*v21), E22/(1-v12*v21), 0;
@@ -85,10 +86,10 @@ Qbar_neg45deg = calcQbar(Q, T_neg45deg, R)
 Qbar_90deg = calcQbar(Q, T_90deg, R)
 
 % QBAR VALUE CHECK
+% Q0deg = Q                    - PASS
 % Q0deg (1,1) = Q90deg (2,2)   - PASS
 % Q45deg (1,1) = Q45deg (2,2)  - PASS
 % Q45deg (3,3) > Q0deg (3,3)   - PASS
-
 
 Sbar_0deg = inv(Qbar_0deg);
 Sbar_pos45deg = inv(Qbar_pos45deg);
@@ -96,6 +97,49 @@ Sbar_neg45deg = inv(Qbar_neg45deg);
 Sbar_90deg = inv(Qbar_90deg);
 
 % Extract projected Young's modulus from Sbar (Ex1x1)
-
+Ex1x1_0deg = 1 / (Sbar_0deg(1,1));          % Projected Young's Modulus for 0 deg layer
+Ex1x1_pos45deg = 1 / (Sbar_pos45deg(1,1));  % Projected Young's Modulus for positive 45 deg layer
+Ex1x1_neg45deg = 1 / (Sbar_neg45deg(1,1));  % Projected Young's Modulus for negative 45 deg layer
+Ex1x1_90deg = 1 / (Sbar_90deg(1,1));        % Projected Young's Modulus for 90 deg layer
 
 % Iterate to find H33_C and Stress per layer
+
+% ************************************************************************
+% ************************** TEST CODE (Claude) **************************
+n_layers = 8;
+t = thickness_oneLayer;     % thickness of one ply [m]
+
+% x2 boundaries for each layer, counting upward (inside to outside)
+% x2_bounds(k)   = bottom (inner) face of layer k  -> x2_i
+% x2_bounds(k+1) = top (outer) face of layer k     -> x2_(i+1)
+% Layer 1 is the innermost ply (0 deg), layer 8 is the outermost ply (0 deg)
+r_inner_wall = prop_diam / 2;                    % innermost radius (bottom of layer 1) [m]
+x2_bounds = r_inner_wall + (0:n_layers) * t;     % [x2_1, x2_2, ..., x2_9]
+
+% Layup ordered inside-out to match x2 counting upward:
+% Layer 1 (innermost) -> Layer 8 (outermost)
+ply_angles_deg = [0, 45, -45, 90, 90, -45, 45, 0];  % [0/+45/-45/90]s, inner to outer
+Ex1x1_layers   = [Ex1x1_0deg, Ex1x1_pos45deg, Ex1x1_neg45deg, Ex1x1_90deg, ...
+                  Ex1x1_90deg, Ex1x1_neg45deg, Ex1x1_pos45deg, Ex1x1_0deg];
+
+% --- Step 5: Iterate layer integrals to build H33_C ---
+H33_C = 0;  % initialize bending stiffness [MPa·m^4]
+
+for k = 1:n_layers
+    x2_i   = x2_bounds(k);     % bottom (inner) face of layer k [m]
+    x2_ip1 = x2_bounds(k+1);   % top (outer) face of layer k   [m]
+    Ex     = Ex1x1_layers(k);  % projected Young's modulus of layer k [MPa]
+
+    % Analytical result of: integral_0^2pi sin^2(theta) dtheta = pi
+    % times: integral_{x2_i}^{x2_(i+1)} r^3 dr = (x2_(i+1)^4 - x2_i^4) / 4
+    radial_integral = (x2_ip1^4 - x2_i^4) / 4;
+
+    H33_C = H33_C + Ex * pi * radial_integral;
+end
+
+% H33_C is now the effective bending stiffness of the composite cylinder [MPa·m^4]
+% (units: [MPa] * [m^4] = [N/m^2 * m^4] = [N·m^2])
+display(H33_C + " [MPa] * [m^4]")
+
+% ************************************************************************
+% ************************************************************************
