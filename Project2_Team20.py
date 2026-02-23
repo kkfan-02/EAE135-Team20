@@ -56,8 +56,9 @@ plt.ylabel('u_{1,axial} (m)')
 plt.title('Axial displacement along beam')
 plt.show()
 """
-# 1.) Find Bending Stiffness H33_C
-# Layup [0/+/-45/90]s
+# 1.) Find Bending Stiffness H33_C (Constant along beam length -> constant c/s)
+# Leave symbolic throughout Calculations
+# Layup [0/+/-45/90]s (8 layers of CFRP)
 # ----------------- [0 deg]
 # ----------------- [+45 deg]
 # ----------------- [-45 deg]
@@ -71,10 +72,14 @@ plt.show()
 
 
 
+
+
 # 2.) Iterating Layer Integrals
 
 
-# 3.) Compute Q Matrix
+# 3.) Compute Q Matrix (Same for all layers)
+
+
 
 
 # 4a.) Find Qbar (Iterate over orientation angle)
