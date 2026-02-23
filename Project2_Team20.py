@@ -10,26 +10,27 @@ rocket_diam = 1.28  # rocket diameter (m)
 prop_diam = 1.18    # propellant diameter (m)
 AoA = 20            # angle of attack (deg)
 length = 5*rocket_diam      # rocket length (m)
-thickness_oneLayer = 6.25e-3        # thickness of one layer of carbon epoxy (m)
+thickness_oneLayer = 0.050 / 8        # thickness of one layer of carbon epoxy (m)
 cpcg = rocket_diam  # distance btwn cp-cg (m)
-P = 600000          # net axial force on O (N)
-W = 8500            # weight of rocket (kg)
+P1_net = 600000          # net axial force on O (N)
+Weight = 8500            # weight of rocket (kg)
 lift = 1400000      # lift force (N)
-FoS = 1.25          # safety factor
+FoS = 1.25          # spacecraft safety factor
 
 # AS4/Epoxy properties
 rho = 1522.3948             # density (kg/m^3)
-E11 = 21.5*6.895e9          # longitudinal modulus (Pa)
-E22 = 1.46*6.895e9          # transverse modulus (Pa)
-v12 = 0.30                  # major Poisson's ratio
-G12 = 0.81*6.895e9          # shear modulus (Pa)
-tens_ax = 310*6.895e6       # axial tensile strength (Pa)
-comp_ax = -184*6.895e6      # axial compressive strength (Pa)
-tens_trav = 7.75*6.895e6    # transverse tensile strength (Pa)
-comp_trav = -24.4*6.895e6   # transverse compressive strength (Pa)
-strain_tens_ax = 0.014      # axial tensile failure strain
-strain_comp_ax = -0.01      # axial compressive failure strain
+StrengthTensile_0deg = 2137  # MPa - Axial Tensile Strength (0 deg ply)
+StrengthCompressive_0deg = -184 * 6.89476 # -184 ksi to MPa (0 deg ply)
+StrengthTensile_90deg = 53.4 # Mpa
+StrengthCompressive_90deg = -24.4 * 6.89476 # -24.4 ksi to MPa (90 deg ply)
+StrengthTensile_45deg = 53.4 # Mpa
+StrengthCompressive_45deg = -24.4 * 6.89476 # -24.4 ksi to MPa (+/-45 deg ply)
 
+# Propellant Properties (HTPB, Aged 185 Days)
+
+
+
+"""
 # Axial Stress/Displacement
 A = np.pi*(rocket_diam/2)**2 - np.pi*(prop_diam/2)**2  # cross-sectional area of the case (m^2)
 
@@ -54,3 +55,34 @@ plt.xlabel('x_1 (m)')
 plt.ylabel('u_{1,axial} (m)')
 plt.title('Axial displacement along beam')
 plt.show()
+"""
+# 1.) Find Bending Stiffness H33_C
+# Layup [0/+/-45/90]s
+# ----------------- [0 deg]
+# ----------------- [+45 deg]
+# ----------------- [-45 deg]
+# ----------------- [90 deg]
+# ----------------- [90 deg]
+# ----------------- [-45 deg]
+# ----------------- [+45 deg]
+# ----------------- [0 deg]
+# \\\\\\\\\\\\\\\\\ [CORE]
+
+
+
+
+# 2.) Iterating Layer Integrals
+
+
+# 3.) Compute Q Matrix
+
+
+# 4a.) Find Qbar (Iterate over orientation angle)
+
+
+# 4b.) Sbar
+
+# 4c.) Extract Projected Young's Modulus for each layer
+
+
+# 5.) 
