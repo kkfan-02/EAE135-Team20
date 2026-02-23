@@ -143,3 +143,22 @@ display(H33_C + " [MPa] * [m^4]")
 
 % ************************************************************************
 % ************************************************************************
+% Step 6: Bending moment M3 as a function of x1
+L_transverse = lift * cos(deg2rad(AoA));   % transverse lift component [N]
+x1_CP = length - cpcg;                     % x1 location of center of pressure [m]
+
+x1_vec = linspace(0, length, 500);         % positions along beam [m]
+
+M3 = zeros(size(x1_vec));
+for i = 1:length(x1_vec)
+    x1 = x1_vec(i);
+    if x1 <= x1_CP
+        M3(i) = -L_transverse * (x1_CP - x1);   % moment from free-body of left portion
+    else
+        M3(i) = 0;
+    end
+end
+
+% Maximum moment is at the fixed end (x1 = 0, leftmost point... 
+% or wherever x1_CP puts it)
+display(M3)
