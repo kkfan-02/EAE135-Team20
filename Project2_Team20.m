@@ -162,3 +162,11 @@ end
 % Maximum moment is at the fixed end (x1 = 0, leftmost point... 
 % or wherever x1_CP puts it)
 display(M3)
+
+
+% ************************************************************************
+% ************** INSTRUCTIONS FOR NEXT ***********************************
+% ************************************************************************
+% M3 code probably not correct
+% Refer to use_for_project2.pdf on canvas to find how to find u2 and u1 from here
+% Also finish the accompanying video
