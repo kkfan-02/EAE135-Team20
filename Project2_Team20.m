@@ -9,9 +9,9 @@ F = 726000;                     % max thrust of first stage [N]
 rocket_diam = 1.28;             % rocket diameter [m]
 prop_diam = 1.18;               % propellant diameter [m]
 AoA = 20;                       % angle of attack [deg]
-rocket_length = 5*rocket_diam;         % rocket length [m]
+beam_length = 5*beam_diam;         % beam length [m]
 thickness_oneLayer = 0.050 / 8;        % thickness of one layer of carbon epoxy (m)
-cpcg = rocket_diam;             % distance btwn cp-cg [m]
+cpcg = beam_diam;             % distance btwn cp-cg [m]
 P1_net = 600000;                % net axial force on O [N]
 Weight = 8500;                  % weight of rocket [kg]
 lift = 1400000;                 % lift force [N]
@@ -145,9 +145,9 @@ display(H33_C + " [MPa] * [m^4]")
 % ************************************************************************
 % Step 6: Bending moment M3 as a function of x1
 L_transverse = lift * cos(deg2rad(AoA));   % transverse lift component [N]
-x1_CP = rocket_length - cpcg;              % x1 location of center of pressure [m]
+x1_CP = beam_length - cpcg;              % x1 location of center of pressure [m]
 
-x1_vec = linspace(0, rocket_length, 500);  % positions along beam [m]
+x1_vec = linspace(0, beam_length, 500);  % positions along beam [m]
 
 M3 = zeros(size(x1_vec));
 for i = 1:length(x1_vec)
@@ -177,3 +177,8 @@ display(M3)
 
 
 % ***************** BENDING PROBLEM *****************
+% Governing Equation 1:
+% 
+% Governing Equation 2:
+%
+% Boundary Conditions: (Investigating section of rocket from Cp -> Cg -> beam_length)
