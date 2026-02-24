@@ -102,10 +102,8 @@ Ex1x1_pos45deg = 1 / (Sbar_pos45deg(1,1));  % Projected Young's Modulus for posi
 Ex1x1_neg45deg = 1 / (Sbar_neg45deg(1,1));  % Projected Young's Modulus for negative 45 deg layer
 Ex1x1_90deg = 1 / (Sbar_90deg(1,1));        % Projected Young's Modulus for 90 deg layer
 
-% Iterate to find H33_C and Stress per layer
-
 % ************************************************************************
-% ************************** TEST CODE (Claude) **************************
+% ************************** H33_C Loop **************************
 n_layers = 8;
 t = thickness_oneLayer;     % thickness of one ply [m]
 
@@ -141,28 +139,6 @@ end
 % (units: [MPa] * [m^4] = [N/m^2 * m^4] = [N·m^2])
 display(H33_C + " [MPa] * [m^4]")
 
-% ************************************************************************
-% ************************************************************************
-% Step 6: Bending moment M3 as a function of x1
-L_transverse = lift * cos(deg2rad(AoA));   % transverse lift component [N]
-x1_CP = beam_length - cpcg;              % x1 location of center of pressure [m]
-
-x1_vec = linspace(0, beam_length, 500);  % positions along beam [m]
-
-M3 = zeros(size(x1_vec));
-for i = 1:length(x1_vec)
-    x1 = x1_vec(i);
-    if x1 <= x1_CP
-        M3(i) = -L_transverse * (x1_CP - x1);   % moment from free-body of left portion
-    else
-        M3(i) = 0;
-    end
-end
-
-% Maximum moment is at the fixed end (x1 = 0, leftmost point... 
-% or wherever x1_CP puts it)
-display(M3)
-
 
 % ************************************************************************
 % ************** INSTRUCTIONS FOR NEXT ***********************************
@@ -182,3 +158,6 @@ display(M3)
 % Governing Equation 2:
 %
 % Boundary Conditions: (Investigating section of rocket from Cp -> Cg -> beam_length)
+% @ Left Edge (Origin = O = Center of Pressure)
+%
+% @ Right Edge (x1 = beam_length)
