@@ -170,3 +170,10 @@ display(M3)
 % M3 code probably not correct
 % Refer to use_for_project2.pdf on canvas to find how to find u2 and u1 from here
 % Also finish the accompanying video
+
+
+% ***************** AXIAL PROBLEM *****************
+% u1_total = u1_axial + u1_bending
+
+
+% ***************** BENDING PROBLEM *****************
