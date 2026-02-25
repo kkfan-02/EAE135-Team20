@@ -139,6 +139,7 @@ end
 % (units: [MPa] * [m^4] = [N/m^2 * m^4] = [N·m^2])
 display(H33_C + " [MPa] * [m^4]")
 
+
 % ************************************************************************
 % ************** INSTRUCTIONS FOR NEXT ***********************************
 % ************************************************************************
@@ -163,6 +164,8 @@ for k = 1:n_layers
     S_axial = S_axial + Ex_Pa * A_k;  % sum axial stiffness contributions [N]
 end
 
+x1_vec = linspace(0, beam_length, 500);  % x1 positions along the beam [m]
+
 % Axial Strain
 u1prime_axial = P1_net / S_axial;  % du1/dx1 (dimensionless)
 
@@ -171,7 +174,7 @@ u1_axial = u1prime_axial * (x1_vec - beam_length);  % [m]
 
 disp("S_axial = " + S_axial + " N");
 disp("u1prime_axial = " + u1prime_axial);
-disp("u1_axial at x=0 (fixed end) = " + u1_axial(1) + " m");
+disp("u1_axial at x=0 (fixed end) = " + u1_axial(1) * 1000 + " mm");
 
 % ***************** BENDING PROBLEM *****************
 % Governing Equation 1:
@@ -182,23 +185,3 @@ disp("u1_axial at x=0 (fixed end) = " + u1_axial(1) + " m");
 % @ Left Edge (Origin = O = Center of Pressure)
 %
 % @ Right Edge (x1 = beam_length)
-% 
-% u2(R) = 0, u2'(R) = 0
-% u2(L) = u2(R) @ x1=cpcg
-% u2'(L) = u2'(R) @ x1=cpcg where u2' is the derivative of u2
-%
-% Weight force in middle of beam section causes discontinuity in shear and bending moment
-% -> Must analyze the beam in two sections (x1=0->cpcg (left) and x1=cpcg->beam_length (right))
-
-
-% Lift and weight forces in x2 direction
-lift_x2 = lift*cos(deg2rad(AoA));
-weight_x2 = Weight * cos(deg2rad(AoA));
-
-% Bending Moment M3 Calculation
-% 
-% Section 1 [Left (L)] - (0 <= x1 <= cpcg (1 beam diameter long section))
-
-
-
-% Section 2 [Right (R)] - (cpcg <= x1 <= beam_length (4 beam diameter long section))
