@@ -299,7 +299,7 @@ end
 disp("Max |sigma11| = " + absmax + " MPa");
 disp("Occurs at x1 = " + x1_vec(xcrit_index) + "m, ply k = " + kcrit + ", side = " + sidecrit);
 
-% ===================== THROUGH-THICKNESS PLOT at x1critical ***chatGPT*** =====================
+% ===================== THROUGH-THICKNESS PLOT at x1critical ***chatGPT*** ====================== %
 
 sigma_top_at_crit = sigma11_top(:, xcrit_index);  % 8x1 [MPa]
 sigma_bot_at_crit = sigma11_bottom(:, xcrit_index);  % 8x1 [MPa]
@@ -317,6 +317,48 @@ legend('top fiber (+x2)', 'bottom fiber (-x2)', 'Location','best');
 
 % Zoom to laminated casing thickness region only:
 ylim([x2_bounds(1) x2_bounds(end)]);        % edit this to be more zoomed in ig if needed
+
+% u1 bending
+u2_prime_0 = u2_prime(1);       % slope at x1 = 0
+
+% representative x2 locations
+x2_outer = x2_bounds(end);      % outer radius
+x2_inner = x2_bounds(1);        % inner radius
+
+% bending axial displacement at outer surface
+u1_bending_outer = -x2_outer * (u2_prime - u2_prime_0);  % [m]
+
+% bending axial displacement at inner surface
+u1_bending_inner = -x2_inner * (u2_prime - u2_prime_0);  % [m]
+
+% ============= u1 and u2 Solutions ============= %
+u1_total_outer = u1_axial + u1_bending_outer;
+u1_total_inner = u1_axial + u1_bending_inner;
+
+figure;
+plot(x1_vec, u2*1000);
+grid on;
+xlabel('x1 [m]');
+ylabel('u2 [mm]');
+title('Transverse displacement u2(x1)');
+
+figure;
+plot(x1_vec, u1_total_outer*1000); hold on;
+plot(x1_vec, u1_total_inner*1000);
+grid on;
+xlabel('x1 [m]');
+ylabel('u1 total [mm]');
+title('Total axial displacement u1(x1)');
+legend('Outer surface','Inner surface');
+
+disp("At x = 0:")
+disp("u1_total (outer) = " + u1_total_outer(1)*1000 + " mm")
+disp("u1_total (inner) = " + u1_total_inner(1)*1000 + " mm")
+disp("u2 = " + u2(1)*1000 + " mm")
+
+% can possibly edit total outer and total inner, idk if that's really necessary, but it does make sense the axial displacement would vary through thickness due to bending
+
+% ================================ END of ChatGPT Code ================================ %
 
 % ================= KEVIN'S COMMENTS ================= %
 
