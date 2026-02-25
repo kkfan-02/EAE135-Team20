@@ -254,8 +254,8 @@ end
 % BC checks
 disp("u2_prime at x=0 (Cp) = " + u2_prime(1));
 disp("u2 at x=0 (Cp) = " + u2(1) * 1000 + " mm");
-disp("u2_prime at x=beam_length (Cg) = " + u2_prime(end));
-disp("u2 at x=beam_length (Cg) = " + u2(end) * 1000 + " mm"); % should be 0 anyways
+disp("u2_prime at x = beam_length = " + u2_prime(end));
+disp("u2 at x = beam_length = " + u2(end) * 1000 + " mm"); % should be 0 anyways
 
 % u2" at sigma11
 
@@ -298,6 +298,25 @@ end
 
 disp("Max |sigma11| = " + absmax + " MPa");
 disp("Occurs at x1 = " + x1_vec(xcrit_index) + "m, ply k = " + kcrit + ", side = " + sidecrit);
+
+% ===================== THROUGH-THICKNESS PLOT at x1critical ***chatGPT*** =====================
+
+sigma_top_at_crit = sigma11_top(:, xcrit_index);  % 8x1 [MPa]
+sigma_bot_at_crit = sigma11_bottom(:, xcrit_index);  % 8x1 [MPa]
+
+x1critical = x1_vec(xcrit_index);  % [m]
+
+figure;
+plot(sigma_top_at_crit, x2_mid, '-o'); hold on;
+plot(sigma_bot_at_crit, x2_mid, '-o');
+grid on;
+xlabel('\sigma_{11}  [MPa]');    % stress on x-axis
+ylabel('x_2 (radius)  [m]');     % thickness coordinate on y-axis
+title("Axial stress through thickness at x1critical = " + x1critical + " m");
+legend('top fiber (+x2)', 'bottom fiber (-x2)', 'Location','best');
+
+% Zoom to laminated casing thickness region only:
+ylim([x2_bounds(1) x2_bounds(end)]);
 
 % ================= KEVIN'S COMMENTS ================= %
 
