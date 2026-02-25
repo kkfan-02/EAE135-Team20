@@ -9,9 +9,9 @@ F = 726000;                     % max thrust of first stage [N]
 rocket_diam = 1.28;             % rocket diameter [m]
 prop_diam = 1.18;               % propellant diameter [m]
 AoA = 20;                       % angle of attack [deg]
-rocket_length = 5*rocket_diam;         % rocket length [m]
+beam_length = 5*beam_diam;         % beam length [m]
 thickness_oneLayer = 0.050 / 8;        % thickness of one layer of carbon epoxy (m)
-cpcg = rocket_diam;             % distance btwn cp-cg [m]
+cpcg = beam_diam;             % distance btwn cp-cg [m]
 P1_net = 600000;                % net axial force on O [N]
 Weight = 8500;                  % weight of rocket [kg]
 lift = 1400000;                 % lift force [N]
@@ -102,10 +102,8 @@ Ex1x1_pos45deg = 1 / (Sbar_pos45deg(1,1));  % Projected Young's Modulus for posi
 Ex1x1_neg45deg = 1 / (Sbar_neg45deg(1,1));  % Projected Young's Modulus for negative 45 deg layer
 Ex1x1_90deg = 1 / (Sbar_90deg(1,1));        % Projected Young's Modulus for 90 deg layer
 
-% Iterate to find H33_C and Stress per layer
-
 % ************************************************************************
-% ************************** TEST CODE (Claude) **************************
+% ************************** H33_C Loop **************************
 n_layers = 8;
 t = thickness_oneLayer;     % thickness of one ply [m]
 
@@ -141,6 +139,7 @@ end
 % (units: [MPa] * [m^4] = [N/m^2 * m^4] = [N·m^2])
 display(H33_C + " [MPa] * [m^4]")
 
+<<<<<<< HEAD
 % ************************************************************************
 % ************************************************************************
 % Step 6: Bending moment M3 as a function of x1
@@ -163,6 +162,8 @@ end
 % or wherever x1_CP puts it)
 display(M3)
 
+=======
+>>>>>>> 23bf5d0dbca96d4193afb250d7727dc07bea9ecc
 
 % ************************************************************************
 % ************** INSTRUCTIONS FOR NEXT ***********************************
@@ -192,10 +193,18 @@ end
 u1prime_axial = P1_net / S_axial;  % du1/dx1 (dimensionless)
 
 % Axial displacement with clamp @ x = rocket_length
-u1_axial = u1prime_axial * (x1_vec - rocket_length);  % [m]
+u1_axial = u1prime_axial * (x1_vec - beam_length);  % [m]
 
 disp("S_axial = " + S_axial + " N");
 disp("u1prime_axial = " + u1prime_axial);
 disp("u1_axial at x=0 (fixed end) = " + u1_axial(1) + " m");
 
 % ***************** BENDING PROBLEM *****************
+% Governing Equation 1:
+%
+% Governing Equation 2:
+%
+% Boundary Conditions: (Investigating section of rocket from Cp -> Cg -> beam_length)
+% @ Left Edge (Origin = O = Center of Pressure)
+%
+% @ Right Edge (x1 = beam_length)
