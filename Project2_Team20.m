@@ -197,6 +197,29 @@ for i = 1:length(x1_vec)
     end
 end
 
+% Now solve for u2 using piecewise integrated forms with constants
+% Unknown constants: C1, C2 (region1), C3, C4 (region 2)
+% Equations
+% (1) u2_2'(L)=0
+% (2) u2_2(L)=0
+% (3) u2_1'(a)=u2_2'(a)
+% (4) u2_1(a)=u2_2(a)
+
+% Region 1:
+% u2_1'(x) = (L_transverse*x^2)/(2H) + C1
+% u2_1(x)  = (L_transverse*x^3)/(6H) + C1*x + C2
+
+% Region 2:
+% u2_2'(x) = (L_transverse*x^2)/(2H) - (W_transverse*(x-a)^2)/(2H) + C3
+% u2_2(x)  = (L_transverse*x^3)/(6H) - (W_transverse*(x-a)^3)/(6H) + C3*x + C4
+
+A = zeros(4,4);
+b = zeros(4,1);
+
+% (1) u2_2'(L)=0:  (L*term) + C3 = 0  -> C3 coefficient 1
+A(1,:) = [0 0 1 0];
+b(1) = -(L_transverse*L^2)/(2*H) + (W_transverse*(L-a)^2)/(2*H);
+
 % Governing Equation 1:
 %
 % Governing Equation 2:
