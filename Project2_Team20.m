@@ -257,6 +257,48 @@ disp("u2 at x=0 (Cp) = " + u2(1) * 1000 + " mm");
 disp("u2_prime at x=beam_length (Cg) = " + u2_prime(end));
 disp("u2 at x=beam_length (Cg) = " + u2(end) * 1000 + " mm"); % should be 0 anyways
 
+% u2" at sigma11
+
+u2_pp = M3 ./ H;        % curvature (kappa) = u2" [1/m]
+
+% representative x2 for each ply: mid-plane
+x2_mid = 0.5*(x2_bounds(1:end-1) + x2_bounds(2:end));  % 1x8
+
+% sigma at top and bottom for each ply and x location
+sigma11_top = zeros(n_layers, length(x1_vec));        % [MPa]
+sigma11_bottom = zeros(n_layers, length(x1_vec));     % [MPa]
+
+for k = 1:n_layers
+    Ex_MPa = Ex1x1_layers(k);
+
+    % top fiber (theta = +90 deg): x2 = +r
+    sigma11_top(k,:) = Ex_MPa * (u1prime_axial - (x2_mid(k)) * u2_pp);
+
+    % bottom fiber (theta = -90 deg): x2 = -r
+    sigma11_bottom(k,:) = Ex_MPa * (u1prime_axial + (x2_mid(k)) * u2_pp);
+end
+
+% Find global max absolute stress
+absmax = 0;
+xcrit_index = 1;
+kcrit = 1;
+sidecrit = "top";
+
+for k = 1:n_layers
+    [m1, i1] = max(abs(sigma11_top(k,:)));
+    if m1 > absmax
+        absmax = m1; xcrit_index = i1; kcrit = k; sidecrit = "top";
+    end
+
+    [m2, i2] = max(abs(sigma11_bottom(k,:)));
+    if m2 > absmax
+        absmax = m2; xcrit_index = i2; kcrit = k; sidecrit = "bottom";
+    end
+end
+
+disp("Max |sigma11| = " + absmax + " MPa");
+disp("Occurs at x1 = " + x1_vec(xcrit_index) + "m, ply k = " + kcrit + ", side = " + sidecrit);
+
 % ================= KEVIN'S COMMENTS ================= %
 
 % Governing Equation 1:
