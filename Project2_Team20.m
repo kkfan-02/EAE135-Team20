@@ -19,19 +19,19 @@ g = 9.81;                       % gravitational acceleration [m/s^2]
 
 % AS4/Epoxy properties
 rho = 1522.3948;                            % density [kg/m^3]
-E11 = 148e3;                                % Axial Young's Modulus [Mpa]
-E22 = 10.5e3;                               % Transverse Young's Modulus [Mpa]
+E11 = 148242.5;                             % Axial Young's Modulus [Mpa]
+E22 = 10066.7;                              % Transverse Young's Modulus [Mpa]
 v12 = 0.30;                                 % Major Poisson's ratio
 v21 = v12*E22/E11;                          % Minor Poisson's ratio
-G12 = 5.61e3;                               % Shear modulus [MPa]
+G12 = 5584.95;                              % Shear modulus [MPa]
 
 % Strengths for failure analysis
-StrengthTensile_0deg = 2137;                % MPa - Axial Tensile Strength (0 deg ply)
-StrengthCompressive_0deg = -184 * 6.9  % -184 ksi to MPa (0 deg ply)
-StrengthTensile_90deg = 53.4;               % Mpa
-StrengthCompressive_90deg = -24.4 * 6.9;% -24.4 ksi to MPa (90 deg ply)
-StrengthTensile_45deg = 53.4;               % Mpa
-StrengthCompressive_45deg = -24.4 * 6.9;% -24.4 ksi to MPa (+/-45 deg ply)
+StrengthTensile_0deg = 2137.45;                 % MPa - Axial Tensile Strength (0 deg ply)
+StrengthCompressive_0deg = -184 * 6.895         % -184 ksi to MPa (0 deg ply)
+StrengthTensile_90deg = 53.43625;               % Mpa
+StrengthCompressive_90deg = -24.4 * 6.895;      % -24.4 ksi to MPa (90 deg ply)
+StrengthTensile_45deg = 53.43625;               % Mpa
+StrengthCompressive_45deg = -24.4 * 6.895;      % -24.4 ksi to MPa (+/-45 deg ply)
 
 % Layup [0/+/-45/90]s (8 layers of CFRP)
 % ----------------- [0 deg (r=1.28/2 = 0.64m)]
