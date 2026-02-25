@@ -28,15 +28,11 @@ G12 = 5.61e3;                               % Shear modulus [MPa]
 
 % Strengths for failure analysis
 StrengthTensile_0deg = 2137;                % MPa - Axial Tensile Strength (0 deg ply)
-StrengthCompressive_0deg = -184 * 6.89476;  % -184 ksi to MPa (0 deg ply)
+StrengthCompressive_0deg = -184 * 6.9  % -184 ksi to MPa (0 deg ply)
 StrengthTensile_90deg = 53.4;               % Mpa
-StrengthCompressive_90deg = -24.4 * 6.89476;% -24.4 ksi to MPa (90 deg ply)
+StrengthCompressive_90deg = -24.4 * 6.9;% -24.4 ksi to MPa (90 deg ply)
 StrengthTensile_45deg = 53.4;               % Mpa
-StrengthCompressive_45deg = -24.4 * 6.89476;% -24.4 ksi to MPa (+/-45 deg ply)
-
-% Propellant Properties (HTPB, Aged 185 Days)
-
-
+StrengthCompressive_45deg = -24.4 * 6.9;% -24.4 ksi to MPa (+/-45 deg ply)
 
 % Layup [0/+/-45/90]s (8 layers of CFRP)
 % ----------------- [0 deg (r=1.28/2 = 0.64m)]
@@ -306,17 +302,69 @@ sigma_bot_at_crit = sigma11_bottom(:, xcrit_index);  % 8x1 [MPa]
 
 x1critical = x1_vec(xcrit_index);  % [m]
 
+% Build stair-step profiles: each ply holds its stress value from its inner to outer boundary
+% Interleave [x2_bounds(k), x2_bounds(k+1)] for each ply's stress value
+sigma_top_stairs = zeros(1, 2*n_layers);
+sigma_bot_stairs = zeros(1, 2*n_layers);
+x2_stairs        = zeros(1, 2*n_layers);
+for k = 1:n_layers
+    sigma_top_stairs(2*k-1) = sigma_top_at_crit(k);
+    sigma_top_stairs(2*k)   = sigma_top_at_crit(k);
+    sigma_bot_stairs(2*k-1) = sigma_bot_at_crit(k);
+    sigma_bot_stairs(2*k)   = sigma_bot_at_crit(k);
+    x2_stairs(2*k-1) = x2_bounds(k);    % inner boundary of ply k
+    x2_stairs(2*k)   = x2_bounds(k+1);  % outer boundary of ply k
+end
+
 figure;
-plot(sigma_top_at_crit, x2_mid, '-o'); hold on;
-plot(sigma_bot_at_crit, x2_mid, '-o');
+plot(sigma_top_stairs, x2_stairs, '-', 'LineWidth', 2); hold on;
+plot(sigma_bot_stairs, x2_stairs, '-', 'LineWidth', 2);
+
+% Label each layer with its ply angle on the right side of the plot
+x_label_offset = max(abs([sigma_top_at_crit; sigma_bot_at_crit])) * 0.05;  % small offset from max stress
+x_label_pos = max(abs([sigma_top_at_crit; sigma_bot_at_crit])) * 1.05;     % just right of plot data
+for k = 1:n_layers
+    angle_str = sprintf('%d°', ply_angles_deg(k));
+    text(x_label_pos, x2_mid(k), angle_str, ...
+        'FontSize', 8, 'Color', [0.2 0.2 0.8], ...
+        'HorizontalAlignment', 'left', 'VerticalAlignment', 'middle');
+    % Draw white dashed lines to delineate each ply boundary
+    yline(x2_bounds(k), '--', 'Color', [1 1 1], 'LineWidth', 0.8);
+end
+yline(x2_bounds(end), '--', 'Color', [1 1 1], 'LineWidth', 0.8);
+
+% Shade tension (right) and compression (left) regions
+xl = xlim;
+yl = [x2_bounds(1), x2_bounds(end)];
+x_max = max(abs([sigma_top_at_crit; sigma_bot_at_crit])) * 1.5;  % shade beyond data range
+patch([0, x_max, x_max, 0], [yl(1), yl(1), yl(2), yl(2)], ...
+    [0 1 0], 'FaceAlpha', 0.06, 'EdgeColor', 'none');             % green = tension
+patch([-x_max, 0, 0, -x_max], [yl(1), yl(1), yl(2), yl(2)], ...
+    [1 0 0], 'FaceAlpha', 0.06, 'EdgeColor', 'none');             % red = compression
+
+% Tension / compression text labels near top of shaded regions
+text( x_max*0.5, yl(2), 'TENSION',     'Color', [0.2 0.8 0.2], 'FontSize', 9, ...
+    'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
+text(-x_max*0.5, yl(2), 'COMPRESSION', 'Color', [1 0.4 0.4],   'FontSize', 9, ...
+    'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
+
+% Zero-stress vertical axis: solid white line, thicker, to show tension/compression boundary
+xline(0, '-', 'Color', [1 1 1], 'LineWidth', 1.5, 'Label', '\sigma=0', ...
+    'LabelVerticalAlignment', 'bottom', 'FontSize', 8);
+
 grid on;
 xlabel('\sigma_{11}  [MPa]');    % stress on x-axis
 ylabel('x_2 (radius)  [m]');     % thickness coordinate on y-axis
 title("Axial stress through thickness at x1critical = " + x1critical + " m");
-legend('top fiber (+x2)', 'bottom fiber (-x2)', 'Location','best');
+legend('Top (+x2, \theta=90°)', 'Bottom (-x2, \theta=-90°)', 'Location','best');
 
 % Zoom to laminated casing thickness region only:
-ylim([x2_bounds(1) x2_bounds(end)]);        % edit this to be more zoomed in ig if needed
+ylim([x2_bounds(1) x2_bounds(end)]);
+xlim([-x_max, x_max]);
+
+% Set y-ticks exactly at layer boundaries and format as rounded decimals
+yticks(x2_bounds);
+yticklabels(arrayfun(@(v) sprintf('%.4f', v), x2_bounds, 'UniformOutput', false));
 
 % u1 bending
 
@@ -356,6 +404,59 @@ disp("u1_total (inner) = " + u1_total_inner(1)*1000 + " mm")
 disp("u2 = " + u2(1)*1000 + " mm")
 
 % can possibly edit total outer and total inner, idk if that's really necessary, but it does make sense the axial displacement would vary through thickness due to bending
+
+% Failure analysis and layer diagnostics
+%
+% Sign convention check:
+%   sigma11 = Ex * (u1' - x2 * u2'')
+%   u2'' = M3/H > 0 near x=0 (concave up, beam bends toward +x2 / windward)
+%   => +x2 side (sigma11_top):    bending term SUBTRACTS -> more compressive
+%   => -x2 side (sigma11_bottom): bending term ADDS     -> more tensile
+%   This is physically consistent: concave-up bending compresses the +x2 face.
+
+% Allowable stresses per ply angle (with FoS applied)
+allowable_tensile  = [StrengthTensile_0deg,  StrengthTensile_45deg,  StrengthTensile_45deg,  StrengthTensile_90deg, ...
+                      StrengthTensile_90deg,  StrengthTensile_45deg,  StrengthTensile_45deg,  StrengthTensile_0deg];
+allowable_compressive = [StrengthCompressive_0deg,  StrengthCompressive_45deg,  StrengthCompressive_45deg,  StrengthCompressive_90deg, ...
+                         StrengthCompressive_90deg,  StrengthCompressive_45deg,  StrengthCompressive_45deg,  StrengthCompressive_0deg];
+
+allow_tens_FoS = allowable_tensile  / FoS;
+allow_comp_FoS = allowable_compressive / FoS;
+
+% For each layer and each fiber side (+x2 / -x2), find worst signed stress over all x1
+function [sigma_crit, allowable, fails] = getWorstStress(stresses_row, allow_t, allow_c)
+    [~, idx] = max(abs(stresses_row));
+    sigma_crit = stresses_row(idx);
+    if sigma_crit >= 0
+        allowable = allow_t;
+    else
+        allowable = allow_c;
+    end
+    fails = abs(sigma_crit) > abs(allowable);
+end
+
+% Print table header
+fprintf('\n');
+fprintf('%-6s %-6s %-8s %-20s %-20s %-8s\n', ...
+    'Layer', 'Angle', 'Side', 'Max sigma11 (MPa)', 'Allowable (MPa)', 'Fails?');
+fprintf('%s\n', repmat('-', 1, 72));
+
+for k = 1:n_layers
+    % +x2 side 
+    [sc_t, al_t, fl_t] = getWorstStress(sigma11_top(k,:),    allow_tens_FoS(k), allow_comp_FoS(k));
+    % -x2 side 
+    [sc_b, al_b, fl_b] = getWorstStress(sigma11_bottom(k,:), allow_tens_FoS(k), allow_comp_FoS(k));
+
+    if fl_t, rs_t = 'YES ***'; else, rs_t = 'No'; end
+    if fl_b, rs_b = 'YES ***'; else, rs_b = 'No'; end
+
+    fprintf('%-6d %-6d %-8s %-20.2f %-20.2f %-8s\n', k, ply_angles_deg(k), '+x2', sc_t, al_t, rs_t);
+    fprintf('%-6d %-6d %-8s %-20.2f %-20.2f %-8s\n', k, ply_angles_deg(k), '-x2', sc_b, al_b, rs_b);
+    fprintf('%s\n', repmat('-', 1, 72));
+end
+fprintf('FoS = %.2f applied to all allowables.\n', FoS);
+fprintf('+x2 side = windward face (bending compression when u2>0)\n');
+fprintf('-x2 side = leeward face  (bending tension  when u2>0)\n');
 
 % ================================ END of ChatGPT Code ================================ %
 
