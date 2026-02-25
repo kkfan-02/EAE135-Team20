@@ -9,9 +9,9 @@ F = 726000;                     % max thrust of first stage [N]
 rocket_diam = 1.28;             % rocket diameter [m]
 prop_diam = 1.18;               % propellant diameter [m]
 AoA = 20;                       % angle of attack [deg]
-beam_length = 5*beam_diam;         % beam length [m]
+beam_length = 5*rocket_diam;         % beam length [m]
 thickness_oneLayer = 0.050 / 8;        % thickness of one layer of carbon epoxy (m)
-cpcg = beam_diam;             % distance btwn cp-cg [m]
+cpcg = rocket_diam;             % distance btwn cp-cg [m]
 P1_net = 600000;                % net axial force on O [N]
 Weight = 8500;                  % weight of rocket [kg]
 lift = 1400000;                 % lift force [N]
@@ -139,32 +139,6 @@ end
 % (units: [MPa] * [m^4] = [N/m^2 * m^4] = [N·m^2])
 display(H33_C + " [MPa] * [m^4]")
 
-<<<<<<< HEAD
-% ************************************************************************
-% ************************************************************************
-% Step 6: Bending moment M3 as a function of x1
-L_transverse = lift * cos(deg2rad(AoA));   % transverse lift component [N]
-x1_CP = rocket_length - cpcg;              % x1 location of center of pressure [m]
-
-x1_vec = linspace(0, rocket_length, 500);  % positions along beam [m]
-
-M3 = zeros(size(x1_vec));
-for i = 1:length(x1_vec)
-    x1 = x1_vec(i);
-    if x1 <= x1_CP
-        M3(i) = -L_transverse * (x1_CP - x1);   % moment from free-body of left portion
-    else
-        M3(i) = 0;
-    end
-end
-
-% Maximum moment is at the fixed end (x1 = 0, leftmost point...
-% or wherever x1_CP puts it)
-display(M3)
-
-=======
->>>>>>> 23bf5d0dbca96d4193afb250d7727dc07bea9ecc
-
 % ************************************************************************
 % ************** INSTRUCTIONS FOR NEXT ***********************************
 % ************************************************************************
@@ -209,8 +183,12 @@ disp("u1_axial at x=0 (fixed end) = " + u1_axial(1) + " m");
 %
 % @ Right Edge (x1 = beam_length)
 % 
+% u2(R) = 0, u2'(R) = 0
+% u2(L) = u2(R) @ x1=cpcg
+% u2'(L) = u2'(R) @ x1=cpcg where u2' is the derivative of u2
+%
 % Weight force in middle of beam section causes discontinuity in shear and bending moment
-% -> Must analyze the beam in two sections (x1=0->cpcg and x1=cpcg->beam_length)
+% -> Must analyze the beam in two sections (x1=0->cpcg (left) and x1=cpcg->beam_length (right))
 
 
 % Lift and weight forces in x2 direction
@@ -218,10 +196,9 @@ lift_x2 = lift*cos(deg2rad(AoA));
 weight_x2 = Weight * cos(deg2rad(AoA));
 
 % Bending Moment M3 Calculation
-% Given Boundary Conditions:
-% u2(R) = 0, u2'(R) = 0
-% Section 1 [Left] - (0 <= x1 <= cpcg (1 beam diameter long section))
+% 
+% Section 1 [Left (L)] - (0 <= x1 <= cpcg (1 beam diameter long section))
 
 
 
-% Section 2 [Right] - (cpcg <= x1 <= beam_length (4 beam diameter long section))
+% Section 2 [Right (R)] - (cpcg <= x1 <= beam_length (4 beam diameter long section))
