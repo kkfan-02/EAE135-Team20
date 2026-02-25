@@ -240,7 +240,7 @@ C1 = C(1); C2 = C(2); C3 = C(3); C4 = C(4);
 u2 = zeros(size(x1_vec));           % [m]
 u2_prime = zeros(size(x1_vec));     % slope [dimensionless]
 
-for i = 1; length(x1_vec)
+for i = 1: length(x1_vec)
     x = x1_vec(i);
     if x < cpcg
         u2_prime(i) = (L_transverse*x^2)/(2*H) + C1;
