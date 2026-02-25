@@ -16,6 +16,7 @@ P1_net = 600000;                % net axial force on O [N]
 Weight = 8500;                  % weight of rocket [kg]
 lift = 1400000;                 % lift force [N]
 FoS = 1.25;                     % spacecraft safety factor
+g = 9.81;                       % gravitational acceleration [m/s^2]
 
 % AS4/Epoxy properties
 rho = 1522.3948;                            % density [kg/m^3]
@@ -177,6 +178,25 @@ disp("u1prime_axial = " + u1prime_axial);
 disp("u1_axial at x=0 (fixed end) = " + u1_axial(1) * 1000 + " mm");
 
 % ***************** BENDING PROBLEM *****************
+
+L_transverse = lift*cosd(AoA);     % [N]
+W_transverse = Weight * g;         % [N]
+
+L = beam_length;                   % [m]
+a = cpcg;                          % [m]
+H = H33_C * 1e6;                   % convert MPa·m^4 to N·m^2
+
+% Build bending moment M3(x) piecewise
+M3 = zeros(size(x1_vec));  % [N·m]
+for i = 1:length(x1_vec)
+    x = x1_vec(i);
+    if x < a
+        M3(i) = L_transverse * x;
+    else
+        M3(i) = L_transverse * x - W_transverse * (x - a);
+    end
+end
+
 % Governing Equation 1:
 %
 % Governing Equation 2:
