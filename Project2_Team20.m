@@ -138,7 +138,7 @@ end
 
 % H33_C is now the effective bending stiffness of the composite cylinder [MPa·m^4]
 % (units: [MPa] * [m^4] = [N/m^2 * m^4] = [N·m^2])
-display(H33_C + " [MPa] * [m^4]")
+disp(H33_C + " [MPa] * [m^4]")
 
 
 % ************************************************************************
@@ -173,8 +173,7 @@ u1prime_axial = P1_net / S_axial;  % du1/dx1 (dimensionless)
 % Axial displacement with clamp @ x = rocket_length
 u1_axial = u1prime_axial * (x1_vec - beam_length);  % [m]
 
-disp("S_axial = " + S_axial + " N");
-disp("u1prime_axial = " + u1prime_axial);
+disp("axial strain = " + u1prime_axial);
 disp("u1_axial at x=0 (fixed end) = " + u1_axial(1) * 1000 + " mm");
 
 % ***************** BENDING PROBLEM *****************
@@ -182,18 +181,16 @@ disp("u1_axial at x=0 (fixed end) = " + u1_axial(1) * 1000 + " mm");
 L_transverse = lift*cosd(AoA);     % [N]
 W_transverse = Weight * g;         % [N]
 
-L = beam_length;                   % [m]
-a = cpcg;                          % [m]
 H = H33_C * 1e6;                   % convert MPa·m^4 to N·m^2
 
 % Build bending moment M3(x) piecewise
 M3 = zeros(size(x1_vec));  % [N·m]
 for i = 1:length(x1_vec)
     x = x1_vec(i);
-    if x < a
+    if x < cpcg
         M3(i) = L_transverse * x;
     else
-        M3(i) = L_transverse * x - W_transverse * (x - a);
+        M3(i) = L_transverse * x - W_transverse * (x - cpcg);
     end
 end
 
@@ -202,39 +199,65 @@ end
 % Equations
 % (1) u2_2'(L)=0
 % (2) u2_2(L)=0
-% (3) u2_1'(a)=u2_2'(a)
-% (4) u2_1(a)=u2_2(a)
+% (3) u2_1'(cpcg)=u2_2'(cpcg)
+% (4) u2_1(cpcg)=u2_2(cpcg)
 
 % Region 1:
 % u2_1'(x) = (L_transverse*x^2)/(2H) + C1
 % u2_1(x)  = (L_transverse*x^3)/(6H) + C1*x + C2
 
 % Region 2:
-% u2_2'(x) = (L_transverse*x^2)/(2H) - (W_transverse*(x-a)^2)/(2H) + C3
-% u2_2(x)  = (L_transverse*x^3)/(6H) - (W_transverse*(x-a)^3)/(6H) + C3*x + C4
+% u2_2'(x) = (L_transverse*x^2)/(2H) - (W_transverse*(x-cpcg)^2)/(2H) + C3
+% u2_2(x)  = (L_transverse*x^3)/(6H) - (W_transverse*(x-cpcg)^3)/(6H) + C3*x + C4
 
 A = zeros(4,4);
 b = zeros(4,1);
 
 % (1) u2_2'(L)=0:  (L*term) + C3 = 0  -> C3 coefficient 1
 A(1,:) = [0 0 1 0];
-b(1) = -(L_transverse*L^2)/(2*H) + (W_transverse*(L-a)^2)/(2*H);
+b(1) = -(L_transverse*beam_length^2)/(2*H) + (W_transverse*(beam_length-cpcg)^2)/(2*H);
 
-% (2) u2_2(L) = 0: C3*L + C4 = -(L_transverse*L^3) + (W_transverse*(L-a)^3) / (6H)
-A(2,:) = [0 0 L 1];
-b(2) = -(L_transverse*L^3)/(6*H) + (W_transverse*(L-a)^3)/(6*H);
+% (2) u2_2(L) = 0: C3*L + C4 = -(L_transverse*L^3) + (W_transverse*(L-cpcg)^3) / (6H)
+A(2,:) = [0 0 beam_length 1];
+b(2) = -(L_transverse*beam_length^3)/(6*H) + (W_transverse*(beam_length-cpcg)^3)/(6*H);
 
-% (3) u2_1'(a)=u2_2'(a)
-% Left:  (L*a^2)/(2H) + C1
-% Right: (L*a^2)/(2H) - (W*(a-a)^2)/(2H) + C3 = (L*a^2)/(2H) + C3 => C1 - C3 = 0
+% (3) u2_1'(cpcg)=u2_2'(cpcg)
+% Left:  (L*cpcg^2)/(2H) + C1
+% Right: (L*cpcg^2)/(2H) - (W_transverse*(cpcg-cpcg)^2)/(2H) + C3 = (L*cpcg^2)/(2H) + C3 => C1 - C3 = 0
 A(3,:) = [1 0 -1 0];
 b(3) = 0;
 
-% (4) u2_1(a)=u2_2(a)
-% Left:  (L*a^3)/(6H) + C1*a + C2
-% Right: (L*a^3)/(6H) - (W*(a-a)^3)/(6H) + C3*a + C4 = (L*a^3)/(6H) + C3*a + C4 => C1*a + C2 - C3*a - C4 = 0
-A(4,:) = [a 1 -a -1];
+% (4) u2_1(cpcg)=u2_2(cpcg)
+% Left:  (L*cpcg^3)/(6H) + C1*cpcg + C2
+% Right: (L*cpcg^3)/(6H) - (W_transverse*(cpcg-cpcg)^3)/(6H) + C3*cpcg + C4 = (L*cpcg^3)/(6H) + C3*cpcg + C4 => C1*cpcg + C2 - C3*cpcg - C4 = 0
+A(4,:) = [cpcg 1 -cpcg -1];
 b(4) = 0;
+
+C = A\b;
+C1 = C(1); C2 = C(2); C3 = C(3); C4 = C(4);
+
+% Evaluate u2 and u2' at x1_vec
+u2 = zeros(size(x1_vec));           % [m]
+u2_prime = zeros(size(x1_vec));     % slope [dimensionless]
+
+for i = 1; length(x1_vec)
+    x = x1_vec(i);
+    if x < cpcg
+        u2_prime(i) = (L_transverse*x^2)/(2*H) + C1;
+        u2(i) = (L_transverse*x^3)/(6*H) + C1*x + C2;
+    else
+        u2_prime(i) = (L_transverse*x^2)/(2*H) - (W_transverse*(x-cpcg)^2)/(2*H) + C3;
+        u2(i) = (L_transverse*x^3)/(6*H) - (W_transverse*(x-cpcg)^3)/(6*H) + C3*x + C4;
+    end
+end
+
+% BC checks
+disp("u2_prime at x=0 (Cp) = " + u2_prime(1));
+disp("u2 at x=0 (Cp) = " + u2(1) * 1000 + " mm");
+disp("u2_prime at x=beam_length (Cg) = " + u2_prime(end));
+disp("u2 at x=beam_length (Cg) = " + u2(end) * 1000 + " mm"); % should be 0 anyways
+
+% ================= KEVIN'S COMMENTS ================= %
 
 % Governing Equation 1:
 %
@@ -257,13 +280,4 @@ b(4) = 0;
 % Pick the higher stress value between L and R for further analysis
 % -> Step by step layer analysis
 
-% Lift and weight forces in x2 direction
-lift_x2 = lift*cos(deg2rad(AoA));
-weight_x2 = Weight * cos(deg2rad(AoA));
-
-% Bending Moment M3 Calculation
-% Section 1 [Left (L)] - (0 <= x1 <= cpcg (1 beam diameter long section))
-
-
-
-% Section 2 [Right (R)] - (cpcg <= x1 <= beam_length (4 beam diameter long section))
+% ==================================================== %
