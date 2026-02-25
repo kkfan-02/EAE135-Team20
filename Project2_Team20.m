@@ -3,7 +3,6 @@
 % DUE: 02/24/26
 
 
-
 % Given Parameters
 F = 726000;                     % max thrust of first stage [N]
 rocket_diam = 1.28;             % rocket diameter [m]
@@ -83,10 +82,10 @@ Qbar_neg45deg = calcQbar(Q, T_neg45deg, R)
 Qbar_90deg = calcQbar(Q, T_90deg, R)
 
 % QBAR VALUE CHECK
-% Q0deg = Q                    - PASS
-% Q0deg (1,1) = Q90deg (2,2)   - PASS
-% Q45deg (1,1) = Q45deg (2,2)  - PASS
-% Q45deg (3,3) > Q0deg (3,3)   - PASS
+% Q0deg = Q
+% Q0deg (1,1) = Q90deg (2,2)
+% Q45deg (1,1) = Q45deg (2,2)
+% Q45deg (3,3) > Q0deg (3,3)
 
 Sbar_0deg = inv(Qbar_0deg);
 Sbar_pos45deg = inv(Qbar_pos45deg);
@@ -95,9 +94,9 @@ Sbar_90deg = inv(Qbar_90deg);
 
 % Extract projected Young's modulus from Sbar (Ex1x1)
 Ex1x1_0deg = 1 / (Sbar_0deg(1,1));          % Projected Young's Modulus for 0 deg layer
-Ex1x1_pos45deg = 1 / (Sbar_pos45deg(1,1));  % Projected Young's Modulus for positive 45 deg layer
-Ex1x1_neg45deg = 1 / (Sbar_neg45deg(1,1));  % Projected Young's Modulus for negative 45 deg layer
-Ex1x1_90deg = 1 / (Sbar_90deg(1,1));        % Projected Young's Modulus for 90 deg layer
+Ex1x1_pos45deg = 1 / (Sbar_pos45deg(1,1));  % "                         " positive 45 deg layer
+Ex1x1_neg45deg = 1 / (Sbar_neg45deg(1,1));  % "                         " negative 45 deg layer
+Ex1x1_90deg = 1 / (Sbar_90deg(1,1));        % "                         " 90 deg layer
 
 % ************************************************************************
 % ************************** H33_C Loop **************************
@@ -117,7 +116,7 @@ ply_angles_deg = [0, 45, -45, 90, 90, -45, 45, 0];  % [0/+45/-45/90]s, inner to 
 Ex1x1_layers   = [Ex1x1_0deg, Ex1x1_pos45deg, Ex1x1_neg45deg, Ex1x1_90deg, ...
     Ex1x1_90deg, Ex1x1_neg45deg, Ex1x1_pos45deg, Ex1x1_0deg];
 
-% --- Step 5: Iterate layer integrals to build H33_C ---
+% Iterate layer integrals to build H33_C
 H33_C = 0;  % initialize bending stiffness [MPa·m^4]
 
 for k = 1:n_layers
@@ -135,15 +134,6 @@ end
 % H33_C is now the effective bending stiffness of the composite cylinder [MPa·m^4]
 % (units: [MPa] * [m^4] = [N/m^2 * m^4] = [N·m^2])
 disp(H33_C + " [MPa] * [m^4]")
-
-
-% ************************************************************************
-% ************** INSTRUCTIONS FOR NEXT ***********************************
-% ************************************************************************
-% M3 code probably not correct
-% Refer to use_for_project2.pdf on canvas to find how to find u2 and u1 from here
-% Also finish the accompanying video
-
 
 % ***************** AXIAL PROBLEM *****************
 % u1_total = u1_axial + u1_bending
@@ -295,7 +285,7 @@ end
 disp("Max |sigma11| = " + absmax + " MPa");
 disp("Occurs at x1 = " + x1_vec(xcrit_index) + "m, ply k = " + kcrit + ", side = " + sidecrit);
 
-% ===================== THROUGH-THICKNESS PLOT at x1critical ***chatGPT*** ====================== %
+% ===================== THROUGH-THICKNESS PLOT at x1critical ====================== %
 
 sigma_top_at_crit = sigma11_top(:, xcrit_index);  % 8x1 [MPa]
 sigma_bot_at_crit = sigma11_bottom(:, xcrit_index);  % 8x1 [MPa]
@@ -403,10 +393,8 @@ disp("u1_total (outer) = " + u1_total_outer(1)*1000 + " mm")
 disp("u1_total (inner) = " + u1_total_inner(1)*1000 + " mm")
 disp("u2 = " + u2(1)*1000 + " mm")
 
-% can possibly edit total outer and total inner, idk if that's really necessary, but it does make sense the axial displacement would vary through thickness due to bending
-
 % Failure analysis and layer diagnostics
-%
+
 % Sign convention check:
 %   sigma11 = Ex * (u1' - x2 * u2'')
 %   u2'' = M3/H > 0 near x=0 (concave up, beam bends toward +x2 / windward)
@@ -416,23 +404,23 @@ disp("u2 = " + u2(1)*1000 + " mm")
 
 % Allowable stresses per ply angle (with FoS applied)
 allowable_tensile  = [StrengthTensile_0deg,  StrengthTensile_45deg,  StrengthTensile_45deg,  StrengthTensile_90deg, ...
-                      StrengthTensile_90deg,  StrengthTensile_45deg,  StrengthTensile_45deg,  StrengthTensile_0deg];
+    StrengthTensile_90deg,  StrengthTensile_45deg,  StrengthTensile_45deg,  StrengthTensile_0deg];
 allowable_compressive = [StrengthCompressive_0deg,  StrengthCompressive_45deg,  StrengthCompressive_45deg,  StrengthCompressive_90deg, ...
-                         StrengthCompressive_90deg,  StrengthCompressive_45deg,  StrengthCompressive_45deg,  StrengthCompressive_0deg];
+    StrengthCompressive_90deg,  StrengthCompressive_45deg,  StrengthCompressive_45deg,  StrengthCompressive_0deg];
 
 allow_tens_FoS = allowable_tensile  / FoS;
 allow_comp_FoS = allowable_compressive / FoS;
 
 % For each layer and each fiber side (+x2 / -x2), find worst signed stress over all x1
 function [sigma_crit, allowable, fails] = getWorstStress(stresses_row, allow_t, allow_c)
-    [~, idx] = max(abs(stresses_row));
-    sigma_crit = stresses_row(idx);
-    if sigma_crit >= 0
-        allowable = allow_t;
-    else
-        allowable = allow_c;
-    end
-    fails = abs(sigma_crit) > abs(allowable);
+[~, idx] = max(abs(stresses_row));
+sigma_crit = stresses_row(idx);
+if sigma_crit >= 0
+    allowable = allow_t;
+else
+    allowable = allow_c;
+end
+fails = abs(sigma_crit) > abs(allowable);
 end
 
 % Print table header
@@ -442,9 +430,9 @@ fprintf('%-6s %-6s %-8s %-20s %-20s %-8s\n', ...
 fprintf('%s\n', repmat('-', 1, 72));
 
 for k = 1:n_layers
-    % +x2 side 
+    % +x2 side
     [sc_t, al_t, fl_t] = getWorstStress(sigma11_top(k,:),    allow_tens_FoS(k), allow_comp_FoS(k));
-    % -x2 side 
+    % -x2 side
     [sc_b, al_b, fl_b] = getWorstStress(sigma11_bottom(k,:), allow_tens_FoS(k), allow_comp_FoS(k));
 
     if fl_t, rs_t = 'YES ***'; else, rs_t = 'No'; end
@@ -457,30 +445,3 @@ end
 fprintf('FoS = %.2f applied to all allowables.\n', FoS);
 fprintf('+x2 side = windward face (bending compression when u2>0)\n');
 fprintf('-x2 side = leeward face  (bending tension  when u2>0)\n');
-
-% ================================ END of ChatGPT Code ================================ %
-
-% ================= KEVIN'S COMMENTS ================= %
-
-% Governing Equation 1:
-%
-% Governing Equation 2:
-%
-% Boundary Conditions: (Investigating section of rocket from Cp -> Cg -> beam_length)
-% @ Left Edge (Origin = O = Center of Pressure)
-%
-% @ Right Edge (x1 = beam_length)
-%
-% u2(R) = 0, u2'(R) = 0
-% u2(L) = u2(R) @ x1=cpcg
-% u2'(L) = u2'(R) @ x1=cpcg where u2' is the derivative of u2 wrt x1 (curvature)
-%
-% Weight force in middle of beam section causes discontinuity in shear and bending moment
-% -> Must analyze the beam in two sections (x1=0->cpcg (left) and x1=cpcg->beam_length (right))
-% Find the axial displacement u1 due to bending for both left and right sides
-% Then find the left and right side total axial displacement by adding u1_axial to both u1(L/R)
-% Find the strain and the stress associated with the axial displacement utot_L and utot_R
-% Pick the higher stress value between L and R for further analysis
-% -> Step by step layer analysis
-
-% ==================================================== %
