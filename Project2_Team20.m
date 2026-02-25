@@ -161,3 +161,20 @@ display(H33_C + " [MPa] * [m^4]")
 % @ Left Edge (Origin = O = Center of Pressure)
 %
 % @ Right Edge (x1 = beam_length)
+% 
+% Weight force in middle of beam section causes discontinuity in shear and bending moment
+% -> Must analyze the beam in two sections (x1=0->cpcg and x1=cpcg->beam_length)
+
+
+% Lift and weight forces in x2 direction
+lift_x2 = lift*cos(deg2rad(AoA));
+weight_x2 = Weight * cos(deg2rad(AoA));
+
+% Bending Moment M3 Calculation
+% Given Boundary Conditions:
+% u2(R) = 0, u2'(R) = 0
+% Section 1 [Left] - (0 <= x1 <= cpcg (1 beam diameter long section))
+
+
+
+% Section 2 [Right] - (cpcg <= x1 <= beam_length (4 beam diameter long section))
