@@ -38,7 +38,7 @@ StrengthCompressive_45deg = -24.4 * 6.89476;% -24.4 ksi to MPa (+/-45 deg ply)
 
 
 % Layup [0/+/-45/90]s (8 layers of CFRP)
-% ----------------- [0 deg (r=1.28/2 = 0.64m)] 
+% ----------------- [0 deg (r=1.28/2 = 0.64m)]
 % ----------------- [+45 deg]
 % ----------------- [-45 deg]
 % ----------------- [90 deg]
@@ -53,8 +53,8 @@ StrengthCompressive_45deg = -24.4 * 6.89476;% -24.4 ksi to MPa (+/-45 deg ply)
 
 % Q Matrix (Same for all layers)
 Q = [ E11/(1-v12*v21), v21*E11/(1-v12*v21), 0;
-      v12*E22/(1-v12*v21), E22/(1-v12*v21), 0;
-      0,                    0,            G12]
+    v12*E22/(1-v12*v21), E22/(1-v12*v21), 0;
+    0,                    0,            G12];
 
 % Find Qbar for each layer
 beta_0deg = deg2rad(0);
@@ -62,9 +62,9 @@ beta_45deg = deg2rad(45);
 beta_90deg = deg2rad(90);
 
 function T = calcTMatrixFromBeta(beta)
-    T = [cos(beta)^2, sin(beta)^2, 2*sin(beta)*cos(beta);
-         sin(beta)^2, cos(beta)^2, -2*sin(beta)*cos(beta);
-         -1*sin(beta)*cos(beta), sin(beta)*cos(beta), cos(beta)^2 - sin(beta)^2];
+T = [cos(beta)^2, sin(beta)^2, 2*sin(beta)*cos(beta);
+    sin(beta)^2, cos(beta)^2, -2*sin(beta)*cos(beta);
+    -1*sin(beta)*cos(beta), sin(beta)*cos(beta), cos(beta)^2 - sin(beta)^2];
 end
 
 T_0deg = calcTMatrixFromBeta(beta_0deg);
@@ -75,9 +75,9 @@ T_90deg = calcTMatrixFromBeta(beta_90deg);
 R = [1 0 0; 0 1 0; 0 0 2];
 
 function Qbar = calcQbar(Q, T, R)
-    T_inv = inv(T);
-    R_inv = inv(R);
-    Qbar = T_inv * Q * R * T * R_inv;
+T_inv = inv(T);
+R_inv = inv(R);
+Qbar = T_inv * Q * R * T * R_inv;
 end
 
 Qbar_0deg = calcQbar(Q, T_0deg, R)
@@ -120,7 +120,7 @@ x2_bounds = r_inner_wall + (0:n_layers) * t;     % [x2_1, x2_2, ..., x2_9]
 % Layer 1 (innermost) -> Layer 8 (outermost)
 ply_angles_deg = [0, 45, -45, 90, 90, -45, 45, 0];  % [0/+45/-45/90]s, inner to outer
 Ex1x1_layers   = [Ex1x1_0deg, Ex1x1_pos45deg, Ex1x1_neg45deg, Ex1x1_90deg, ...
-                  Ex1x1_90deg, Ex1x1_neg45deg, Ex1x1_pos45deg, Ex1x1_0deg];
+    Ex1x1_90deg, Ex1x1_neg45deg, Ex1x1_pos45deg, Ex1x1_0deg];
 
 % --- Step 5: Iterate layer integrals to build H33_C ---
 H33_C = 0;  % initialize bending stiffness [MPa·m^4]
@@ -159,7 +159,7 @@ for i = 1:length(x1_vec)
     end
 end
 
-% Maximum moment is at the fixed end (x1 = 0, leftmost point... 
+% Maximum moment is at the fixed end (x1 = 0, leftmost point...
 % or wherever x1_CP puts it)
 display(M3)
 
@@ -175,5 +175,27 @@ display(M3)
 % ***************** AXIAL PROBLEM *****************
 % u1_total = u1_axial + u1_bending
 
+% Axial Stiffness
+S_axial = 0;
+
+for k = 1:n_layers
+    r_i = x2_bounds(k);         % inner radius of layer k [m]
+    r_ip1 = x2_bounds(k+1);     % outer radius of layer k [m]
+    Ex_MPa = Ex1x1_layers(k);   % projected Young's modulus of layer k [MPa]
+    Ex_Pa = Ex_MPa * 1e6;       % convert MPa to Pa
+
+    A_k = pi * (r_ip1^2 - r_i^2);  % cross-sectional area of layer k [m^2]
+    S_axial = S_axial + Ex_Pa * A_k;  % sum axial stiffness contributions [N]
+end
+
+% Axial Strain
+u1prime_axial = P1_net / S_axial;  % du1/dx1 (dimensionless)
+
+% Axial displacement with clamp @ x = rocket_length
+u1_axial = u1prime_axial * (x1_vec - rocket_length);  % [m]
+
+disp("S_axial = " + S_axial + " N");
+disp("u1prime_axial = " + u1prime_axial);
+disp("u1_axial at x=0 (fixed end) = " + u1_axial(1) + " m");
 
 % ***************** BENDING PROBLEM *****************
