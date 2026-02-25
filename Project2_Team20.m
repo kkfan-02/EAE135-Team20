@@ -319,17 +319,16 @@ legend('top fiber (+x2)', 'bottom fiber (-x2)', 'Location','best');
 ylim([x2_bounds(1) x2_bounds(end)]);        % edit this to be more zoomed in ig if needed
 
 % u1 bending
-u2_prime_0 = u2_prime(1);       % slope at x1 = 0
 
 % representative x2 locations
 x2_outer = x2_bounds(end);      % outer radius
 x2_inner = x2_bounds(1);        % inner radius
 
 % bending axial displacement at outer surface
-u1_bending_outer = -x2_outer * (u2_prime - u2_prime_0);  % [m]
+u1_bending_outer = -x2_outer * (u2_prime);  % [m]
 
 % bending axial displacement at inner surface
-u1_bending_inner = -x2_inner * (u2_prime - u2_prime_0);  % [m]
+u1_bending_inner = -x2_inner * (u2_prime);  % [m]
 
 % ============= u1 and u2 Solutions ============= %
 u1_total_outer = u1_axial + u1_bending_outer;
