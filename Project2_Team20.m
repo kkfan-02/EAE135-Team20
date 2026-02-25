@@ -316,7 +316,7 @@ title("Axial stress through thickness at x1critical = " + x1critical + " m");
 legend('top fiber (+x2)', 'bottom fiber (-x2)', 'Location','best');
 
 % Zoom to laminated casing thickness region only:
-ylim([x2_bounds(1) x2_bounds(end)]);
+ylim([x2_bounds(1) x2_bounds(end)]);        % edit this to be more zoomed in ig if needed
 
 % ================= KEVIN'S COMMENTS ================= %
 
