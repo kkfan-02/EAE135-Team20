@@ -220,6 +220,22 @@ b = zeros(4,1);
 A(1,:) = [0 0 1 0];
 b(1) = -(L_transverse*L^2)/(2*H) + (W_transverse*(L-a)^2)/(2*H);
 
+% (2) u2_2(L) = 0: C3*L + C4 = -(L_transverse*L^3) + (W_transverse*(L-a)^3) / (6H)
+A(2,:) = [0 0 L 1];
+b(2) = -(L_transverse*L^3)/(6*H) + (W_transverse*(L-a)^3)/(6*H);
+
+% (3) u2_1'(a)=u2_2'(a)
+% Left:  (L*a^2)/(2H) + C1
+% Right: (L*a^2)/(2H) - (W*(a-a)^2)/(2H) + C3 = (L*a^2)/(2H) + C3 => C1 - C3 = 0
+A(3,:) = [1 0 -1 0];
+b(3) = 0;
+
+% (4) u2_1(a)=u2_2(a)
+% Left:  (L*a^3)/(6H) + C1*a + C2
+% Right: (L*a^3)/(6H) - (W*(a-a)^3)/(6H) + C3*a + C4 = (L*a^3)/(6H) + C3*a + C4 => C1*a + C2 - C3*a - C4 = 0
+A(4,:) = [a 1 -a -1];
+b(4) = 0;
+
 % Governing Equation 1:
 %
 % Governing Equation 2:
@@ -228,7 +244,7 @@ b(1) = -(L_transverse*L^2)/(2*H) + (W_transverse*(L-a)^2)/(2*H);
 % @ Left Edge (Origin = O = Center of Pressure)
 %
 % @ Right Edge (x1 = beam_length)
-% 
+%
 % u2(R) = 0, u2'(R) = 0
 % u2(L) = u2(R) @ x1=cpcg
 % u2'(L) = u2'(R) @ x1=cpcg where u2' is the derivative of u2 wrt x1 (curvature)
