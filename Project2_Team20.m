@@ -139,6 +139,7 @@ end
 % (units: [MPa] * [m^4] = [N/m^2 * m^4] = [N·m^2])
 display(H33_C + " [MPa] * [m^4]")
 
+
 % ************************************************************************
 % ************** INSTRUCTIONS FOR NEXT ***********************************
 % ************************************************************************
@@ -163,6 +164,8 @@ for k = 1:n_layers
     S_axial = S_axial + Ex_Pa * A_k;  % sum axial stiffness contributions [N]
 end
 
+x1_vec = linspace(0, beam_length, 500);  % x1 positions along the beam [m]
+
 % Axial Strain
 u1prime_axial = P1_net / S_axial;  % du1/dx1 (dimensionless)
 
@@ -171,7 +174,7 @@ u1_axial = u1prime_axial * (x1_vec - beam_length);  % [m]
 
 disp("S_axial = " + S_axial + " N");
 disp("u1prime_axial = " + u1prime_axial);
-disp("u1_axial at x=0 (fixed end) = " + u1_axial(1) + " m");
+disp("u1_axial at x=0 (fixed end) = " + u1_axial(1) * 1000 + " mm");
 
 % ***************** BENDING PROBLEM *****************
 % Governing Equation 1:
