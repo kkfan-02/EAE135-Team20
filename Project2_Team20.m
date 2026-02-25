@@ -219,35 +219,3 @@ b = zeros(4,1);
 % (1) u2_2'(L)=0:  (L*term) + C3 = 0  -> C3 coefficient 1
 A(1,:) = [0 0 1 0];
 b(1) = -(L_transverse*L^2)/(2*H) + (W_transverse*(L-a)^2)/(2*H);
-
-% Governing Equation 1:
-%
-% Governing Equation 2:
-%
-% Boundary Conditions: (Investigating section of rocket from Cp -> Cg -> beam_length)
-% @ Left Edge (Origin = O = Center of Pressure)
-%
-% @ Right Edge (x1 = beam_length)
-% 
-% u2(R) = 0, u2'(R) = 0
-% u2(L) = u2(R) @ x1=cpcg
-% u2'(L) = u2'(R) @ x1=cpcg where u2' is the derivative of u2 wrt x1 (curvature)
-%
-% Weight force in middle of beam section causes discontinuity in shear and bending moment
-% -> Must analyze the beam in two sections (x1=0->cpcg (left) and x1=cpcg->beam_length (right))
-% Find the axial displacement u1 due to bending for both left and right sides
-% Then find the left and right side total axial displacement by adding u1_axial to both u1(L/R)
-% Find the strain and the stress associated with the axial displacement utot_L and utot_R
-% Pick the higher stress value between L and R for further analysis
-% -> Step by step layer analysis
-
-% Lift and weight forces in x2 direction
-lift_x2 = lift*cos(deg2rad(AoA));
-weight_x2 = Weight * cos(deg2rad(AoA));
-
-% Bending Moment M3 Calculation
-% Section 1 [Left (L)] - (0 <= x1 <= cpcg (1 beam diameter long section))
-
-
-
-% Section 2 [Right (R)] - (cpcg <= x1 <= beam_length (4 beam diameter long section))
